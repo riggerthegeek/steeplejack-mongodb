@@ -10,9 +10,7 @@
   "peerDependencies": {
     "generic-pool": "^2.0.0",
     "mongodb": "^2.0.0",
-    "steeplejack": "*",
-    "steeplejack-db": "*",
-    "steeplejack-errors": "^0.1.0"
+    "steeplejack": "*"
   },
   "devDependencies": {
     "chai": "^3.2.0",
