@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "description": "MongoDB implementation for steeplejack projects",
   "main": "./src/main",
-  "dependencies": {},
+  "dependencies": {
+    "async": "^1.4.2",
+    "lodash": "^3.10.1"
+  },
   "peerDependencies": {
     "generic-pool": "^2.0.0",
     "steeplejack": "*",
