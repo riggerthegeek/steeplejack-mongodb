@@ -19,4 +19,6 @@ var steeplejack = require("steeplejack");
 
 
 module.exports = new steeplejack.Plugin([
+    require("./lib/driver"),
+    require("./lib/indexer")
 ]);

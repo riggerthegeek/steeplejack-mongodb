@@ -20,17 +20,20 @@ describe("main test", function () {
 
     var main,
         Plugin,
-        PoolGrabber;
+        driver,
+        indexer;
     beforeEach(function () {
 
         Plugin = sinon.spy();
-        PoolGrabber = sinon.spy();
+        driver = sinon.spy();
+        indexer = sinon.spy();
 
         main = proxyquire("../../src/main", {
             steeplejack: {
                 Plugin: Plugin
             },
-            //"./lib/PoolGrabber": PoolGrabber
+            "./lib/driver": driver,
+            "./lib/indexer": indexer
         });
 
     });
@@ -41,7 +44,8 @@ describe("main test", function () {
         expect(Plugin).to.be.calledOnce
             .calledWithNew
             .calledWithExactly([
-                //PoolGrabber
+                driver,
+                indexer
             ]);
 
         expect(main).to.be.instanceof(Plugin);
