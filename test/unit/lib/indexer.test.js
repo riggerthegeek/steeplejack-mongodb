@@ -89,7 +89,7 @@ describe("mongoIndexer test", function () {
 
     describe("array of objects", function () {
 
-        it.only("should handle an error", function () {
+        it("should handle an error", function (done) {
 
             createIndex.rejects("err");
 
@@ -104,21 +104,29 @@ describe("mongoIndexer test", function () {
                 col5: 1
             }];
 
-            expect(mongoIndexer(db, indexes, "someothertable")).to.be.eventually.rejectedWith("err");
+            mongoIndexer(db, indexes, "someothertable")
+                .catch(function (err) {
 
-            expect(db.collection).to.be.calledOnce
-                .calledWith("someothertable");
+                    expect(err).to.be.instanceof(Error);
+                    expect(err.message).to.be.equal("err");
 
-            expect(createIndex).to.be.calledOnce
-                .calledWithExactly(indexes[0], {
-                    background: true,
-                    name: "col1-col2-col3",
-                    w: 1
+                    expect(db.collection).to.be.calledOnce
+                        .calledWith("someothertable");
+
+                    expect(createIndex).to.be.calledOnce
+                        .calledWithExactly(indexes[0], {
+                            background: true,
+                            name: "col1-col2-col3",
+                            w: 1
+                        });
+
+                    done();
+
                 });
 
         });
 
-        it("should be successful", function () {
+        it("should be successful", function (done) {
 
             createIndex.resolves("result");
 
@@ -133,30 +141,37 @@ describe("mongoIndexer test", function () {
                 col5: 1
             }];
 
-            expect(mongoIndexer(db, indexes, "someothertable")).to.be.eventually.eql([
-                "result",
-                "result",
-                "result"
-            ]);
+            mongoIndexer(db, indexes, "someothertable")
+                .then(function (arr) {
 
-            expect(db.collection).to.be.calledThrice
-                .calledWith("someothertable");
+                    expect(arr).to.be.eql([
+                        "result",
+                        "result",
+                        "result"
+                    ]);
 
-            expect(createIndex).to.be.calledThrice
-                .calledWith(indexes[0], {
-                    background: true,
-                    name: "col1-col2-col3",
-                    w: 1
-                })
-                .calledWith(indexes[1], {
-                    background: true,
-                    name: "col3-col2",
-                    w: 1
-                })
-                .calledWith(indexes[2], {
-                    background: true,
-                    name: "col5",
-                    w: 1
+                    expect(db.collection).to.be.calledThrice
+                        .calledWith("someothertable");
+
+                    expect(createIndex).to.be.calledThrice
+                        .calledWith(indexes[0], {
+                            background: true,
+                            name: "col1-col2-col3",
+                            w: 1
+                        })
+                        .calledWith(indexes[1], {
+                            background: true,
+                            name: "col3-col2",
+                            w: 1
+                        })
+                        .calledWith(indexes[2], {
+                            background: true,
+                            name: "col5",
+                            w: 1
+                        });
+
+                    done();
+
                 });
 
         });

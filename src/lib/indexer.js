@@ -28,21 +28,17 @@ module.exports.__factory = function $mongoIndexer () {
 
         if (_.isArray(index)) {
 
-            return bluebird.all(index.map(function (obj) {
+            return bluebird
+                .map(index, function (obj) {
 
-                return mongoIndexer(db, obj, tableName, opts)
-                    .catch(function (err) {
-                        console.log(err);
-                        throw err;
-                    });
+                    return mongoIndexer(db, obj, tableName, opts);
 
-            })).catch(function () {
-                console.log(arguments);
-                process.exit();
-            });
+                }, {
+                    concurrency: 1
+                })
+                .all();
 
         } else {
-            console.log(2);
 
             /* Have to clone the opts as the defaults changes the object */
             return db.collection(tableName)
