@@ -15,7 +15,7 @@
 
 
 /* Third-party modules */
-var async = require("async");
+var bluebird = require("bluebird");
 var mongodb = require("mongodb");
 var poolModule = require("generic-pool");
 var steeplejack = require("steeplejack");
@@ -58,55 +58,41 @@ function createConnection (config, StoreError) {
             w: 1
         });
 
-        var tasks = [];
-
         /* Open the database */
-        tasks.push(function (callback) {
-            db.open(callback);
-        });
+        db.open()
+            .then(function (db) {
 
-        var username = config.username;
-        var password = config.password;
+                var username = config.username;
+                var password = config.password;
 
-        /* Authenticate if appropriate */
-        if (username) {
+                /* Do we want to authenticate */
+                if (username) {
 
-            tasks.push(function (db, callback) {
+                    return db
+                        .authenticate(username, password)
+                        .then(function (result) {
 
-                db.authenticate(username, password, function (err, result) {
+                            if (result !== true) {
+                                return bluebird.reject("Cannot authenticate the MongoDB");
+                            }
 
-                    if (err) {
-                        /* Not authenticated */
-                        callback(err);
-                        return;
-                    }
+                            return db;
 
-                    if (result !== true) {
-                        callback("Cannot authenticate the MongoDB");
-                        return;
-                    }
+                        });
 
-                    callback(null, db);
+                }
 
-                });
+                return db;
 
-            });
-
-        }
-
-        /* Fire the tasks */
-        async.waterfall(tasks, function (err, db) {
-
-            if (err) {
+            })
+            .then(function (db) {
+                /* Successfully connected - return the callback */
+                cb(null, db);
+            })
+            .catch(function (err) {
                 /* Wrap in a StoreError */
                 cb(new StoreError(err), null);
-                return;
-            }
-
-            /* Return the DB instance */
-            cb(null, db);
-
-        });
+            });
 
     };
 

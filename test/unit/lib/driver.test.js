@@ -58,12 +58,21 @@ describe("mongodb test", function () {
 
         describe("configuration", function () {
 
-            it("should call the Db and Server with no config", function () {
+            it("should call the Db and Server with no config", function (done) {
 
                 /* Invoke the factory */
                 mongodb({});
 
-                var obj = Pool.create();
+                dbInst.open.resolves(dbInst);
+
+                var obj = Pool.create(function (err, result) {
+
+                    expect(err).to.be.null;
+                    expect(result).to.be.equal(dbInst);
+
+                    done();
+
+                });
 
                 expect(obj).to.be.undefined;
 
@@ -77,7 +86,7 @@ describe("mongodb test", function () {
 
             });
 
-            it("should call the Db and Server configured", function () {
+            it("should call the Db and Server configured", function (done) {
 
                 mongodb({
                     db: "dbname",
@@ -85,7 +94,16 @@ describe("mongodb test", function () {
                     port: 27018
                 });
 
-                var obj = Pool.create();
+                dbInst.open.resolves(dbInst);
+
+                var obj = Pool.create(function (err, result) {
+
+                    expect(err).to.be.null;
+                    expect(result).to.be.equal(dbInst);
+
+                    done();
+
+                });
 
                 expect(obj).to.be.undefined;
 
@@ -106,7 +124,7 @@ describe("mongodb test", function () {
 
             it("should create a server with no username/password", function (done) {
 
-                dbInst.open.yields(null, dbInst);
+                dbInst.open.resolves(dbInst);
 
                 mongodb({
                     db: "dbname",
@@ -129,7 +147,7 @@ describe("mongodb test", function () {
 
             it("should fail to create a server with no username/password", function (done) {
 
-                dbInst.open.yields(new Error("error"), null);
+                dbInst.open.rejects(new Error("error"));
 
                 mongodb({
                     db: "dbname",
@@ -154,8 +172,8 @@ describe("mongodb test", function () {
 
             it("should create a server with a username/password", function (done) {
 
-                dbInst.open.yields(null, dbInst);
-                dbInst.authenticate.yields(null, true);
+                dbInst.open.resolves(dbInst);
+                dbInst.authenticate.resolves(true);
 
                 mongodb({
                     db: "dbname",
@@ -183,8 +201,8 @@ describe("mongodb test", function () {
 
             it("should create a server with a username/password and be unauthenticated", function (done) {
 
-                dbInst.open.yields(null, dbInst);
-                dbInst.authenticate.yields(null, false);
+                dbInst.open.resolves(dbInst);
+                dbInst.authenticate.resolves(false);
 
                 mongodb({
                     db: "dbname",
@@ -214,8 +232,8 @@ describe("mongodb test", function () {
 
             it("should fail to create a server with a username/password", function (done) {
 
-                dbInst.open.yields(null, dbInst);
-                dbInst.authenticate.yields(new Error("message"), null);
+                dbInst.open.resolves(dbInst);
+                dbInst.authenticate.rejects(new Error("message"));
 
                 mongodb({
                     db: "dbname",
