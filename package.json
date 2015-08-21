@@ -5,6 +5,7 @@
   "main": "./src/main",
   "dependencies": {
     "async": "^1.4.2",
+    "bluebird": "^2.9.34",
     "lodash": "^3.10.1"
   },
   "peerDependencies": {
