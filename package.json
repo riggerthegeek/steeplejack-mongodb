@@ -8,8 +8,8 @@
     "lodash": "^3.10.1"
   },
   "peerDependencies": {
-    "generic-pool": "^2.0.0",
-    "mongodb": "^2.0.0",
+    "generic-pool": ">=2.0.0",
+    "mongodb": ">=2.0.0",
     "steeplejack": "*"
   },
   "devDependencies": {
