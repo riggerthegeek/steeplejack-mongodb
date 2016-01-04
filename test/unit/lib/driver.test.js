@@ -9,6 +9,7 @@
 
 
 /* Third-party modules */
+var bluebird = require("bluebird");
 var proxyquire = require("proxyquire");
 
 
@@ -17,17 +18,18 @@ var proxyquire = require("proxyquire");
 
 describe("mongodb test", function () {
 
-    var mongodb, mongodbDep, dbInst, Pool, StoreError;
+    var mongodb,
+        mongodbDep,
+        dbInst,
+        Pool,
+        StoreError;
     beforeEach(function () {
 
         dbInst = {
-            open: sinon.stub(),
-            authenticate: sinon.stub()
         };
 
         mongodbDep = {
-            Db: sinon.stub().returns(dbInst),
-            Server: sinon.stub()
+            connect: sinon.stub().resolves(dbInst)
         };
 
         var pool = {
@@ -58,62 +60,63 @@ describe("mongodb test", function () {
 
         describe("configuration", function () {
 
-            it("should call the Db and Server with no config", function (done) {
+            it("should call the Db with no config, returning a promise", function () {
 
                 /* Invoke the factory */
-                mongodb({});
+                mongodb();
 
-                dbInst.open.resolves(dbInst);
+                return Pool.create()
+                    .then(function (db) {
 
-                var obj = Pool.create(function (err, result) {
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://localhost", {
+                                promiseLibrary: bluebird
+                            });
 
-                    expect(err).to.be.null;
-                    expect(result).to.be.equal(dbInst);
+                        expect(db).to.be.equal(dbInst);
 
-                    done();
-
-                });
-
-                expect(obj).to.be.undefined;
-
-                expect(mongodbDep.Server).to.be.calledOnce
-                    .calledWith(undefined, undefined);
-
-                expect(mongodbDep.Db).to.be.calledOnce
-                    .calledWith(undefined, {}, {
-                        w: 1
                     });
 
             });
 
-            it("should call the Db and Server configured", function (done) {
+            it("should call the Db with no config, returning a callback", function () {
 
+                /* Invoke the factory */
+                mongodb();
+
+                return Pool.create(function (err, db) {
+
+                    expect(mongodbDep.connect).to.be.calledOnce
+                        .calledWithExactly("mongodb://localhost", {
+                            promiseLibrary: bluebird
+                        });
+
+                    expect(err).to.be.null;
+                    expect(db).to.be.equal(dbInst);
+
+                });
+
+            });
+
+            it("should call the Db configured", function () {
+
+                /* Invoke the factory */
                 mongodb({
                     db: "dbname",
                     host: "localhost",
                     port: 27018
                 });
 
-                dbInst.open.resolves(dbInst);
+                return Pool.create()
+                    .then(function (db) {
 
-                var obj = Pool.create(function (err, result) {
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://localhost:27018/dbname", {
+                                promiseLibrary: bluebird
+                            });
 
-                    expect(err).to.be.null;
-                    expect(result).to.be.equal(dbInst);
+                        expect(db).to.be.equal(dbInst);
 
-                    done();
-
-                });
-
-                expect(obj).to.be.undefined;
-
-                expect(mongodbDep.Server).to.be.calledOnce
-                    .calledWithNew
-                    .calledWith("localhost", 27018);
-
-                expect(mongodbDep.Db).to.be.calledOnce
-                    .calledWith("dbname", {}, {
-                        w: 1
                     });
 
             });
@@ -122,9 +125,7 @@ describe("mongodb test", function () {
 
         describe("server setup", function () {
 
-            it("should create a server with no username/password", function (done) {
-
-                dbInst.open.resolves(dbInst);
+            it("should create a server with no username/password", function () {
 
                 mongodb({
                     db: "dbname",
@@ -132,22 +133,21 @@ describe("mongodb test", function () {
                     port: 27018
                 });
 
-                Pool.create(function (err, db) {
+                return Pool.create()
+                    .then(function (db) {
 
-                    expect(err).to.be.null;
-                    expect(db).to.be.equal(dbInst);
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://localhost:27018/dbname", {
+                                promiseLibrary: bluebird
+                            });
 
-                    expect(dbInst.open).to.be.calledOnce;
+                        expect(db).to.be.equal(dbInst);
 
-                    done();
-
-                });
+                    });
 
             });
 
-            it("should fail to create a server with no username/password", function (done) {
-
-                dbInst.open.rejects(new Error("error"));
+            it("should fail to create a server with no username/password - promise", function () {
 
                 mongodb({
                     db: "dbname",
@@ -155,25 +155,53 @@ describe("mongodb test", function () {
                     port: 27018
                 });
 
-                Pool.create(function (err, db) {
+                mongodbDep.connect.rejects("error");
+
+                return Pool.create()
+                    .then(function () {
+                        throw new Error("Should fail");
+                    })
+                    .catch(function (err) {
+
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://localhost:27018/dbname", {
+                                promiseLibrary: bluebird
+                            });
+
+                        expect(err).to.be.instanceof(StoreError);
+                        expect(err.message).to.be.equal("error");
+
+                    });
+
+            });
+
+            it("should fail to create a server with no username/password - callback", function () {
+
+                mongodb({
+                    db: "dbname",
+                    host: "localhost",
+                    port: 27018
+                });
+
+                mongodbDep.connect.rejects("error");
+
+                return Pool.create(function (err, db) {
+
+                    expect(mongodbDep.connect).to.be.calledOnce
+                        .calledWithExactly("mongodb://localhost:27018/dbname", {
+                            promiseLibrary: bluebird
+                        });
 
                     expect(err).to.be.instanceof(StoreError);
                     expect(err.message).to.be.equal("error");
 
-                    expect(db).to.be.null;
-
-                    expect(dbInst.open).to.be.calledOnce;
-
-                    done();
+                    expect(db).to.be.undefined;
 
                 });
 
             });
 
-            it("should create a server with a username/password", function (done) {
-
-                dbInst.open.resolves(dbInst);
-                dbInst.authenticate.resolves(true);
+            it("should create a server with a username/password", function () {
 
                 mongodb({
                     db: "dbname",
@@ -183,81 +211,47 @@ describe("mongodb test", function () {
                     port: 27018
                 });
 
-                Pool.create(function (err, db) {
+                return Pool.create()
+                    .then(function (db) {
 
-                    expect(err).to.be.null;
-                    expect(db).to.be.equal(dbInst);
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://user:pass@localhost:27018/dbname", {
+                                promiseLibrary: bluebird
+                            });
 
-                    expect(dbInst.open).to.be.calledOnce;
+                        expect(db).to.be.equal(dbInst);
 
-                    expect(dbInst.authenticate).to.be.calledOnce
-                        .calledWith("user", "pass");
-
-                    done();
-
-                });
+                    });
 
             });
 
-            it("should create a server with a username/password and be unauthenticated", function (done) {
-
-                dbInst.open.resolves(dbInst);
-                dbInst.authenticate.resolves(false);
+            it("should create a server with a username/password and be unauthenticated", function () {
 
                 mongodb({
-                    db: "dbname",
-                    username: "user",
-                    password: "pass",
-                    host: "localhost",
-                    port: 27018
+                    db: "mydb",
+                    username: "user1",
+                    password: "pass1",
+                    host: "192.168.99.100",
+                    port: 32771
                 });
 
-                Pool.create(function (err, db) {
+                mongodbDep.connect.rejects("error");
 
-                    expect(err).to.be.instanceof(StoreError);
-                    expect(err.message).to.be.equal("Cannot authenticate the MongoDB");
+                return Pool.create()
+                    .then(function () {
+                        throw new Error("Should fail");
+                    })
+                    .catch(function (err) {
 
-                    expect(db).to.be.null;
+                        expect(mongodbDep.connect).to.be.calledOnce
+                            .calledWithExactly("mongodb://user1:pass1@192.168.99.100:32771/mydb", {
+                                promiseLibrary: bluebird
+                            });
 
-                    expect(dbInst.open).to.be.calledOnce;
+                        expect(err).to.be.instanceof(StoreError);
+                        expect(err.message).to.be.equal("error");
 
-                    expect(dbInst.authenticate).to.be.calledOnce
-                        .calledWith("user", "pass");
-
-                    done();
-
-                });
-
-            });
-
-            it("should fail to create a server with a username/password", function (done) {
-
-                dbInst.open.resolves(dbInst);
-                dbInst.authenticate.rejects(new Error("message"));
-
-                mongodb({
-                    db: "dbname",
-                    username: "user",
-                    password: "pass",
-                    host: "localhost",
-                    port: 27018
-                });
-
-                Pool.create(function (err, db) {
-
-                    expect(err).to.be.instanceof(StoreError);
-                    expect(err.message).to.be.equal("message");
-
-                    expect(db).to.be.null;
-
-                    expect(dbInst.open).to.be.calledOnce;
-
-                    expect(dbInst.authenticate).to.be.calledOnce
-                        .calledWith("user", "pass");
-
-                    done();
-
-                });
+                    });
 
             });
 

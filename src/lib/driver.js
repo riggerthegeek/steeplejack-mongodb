@@ -15,6 +15,7 @@
 
 
 /* Third-party modules */
+var _ = require("lodash");
 var bluebird = require("bluebird");
 var mongodb = require("mongodb");
 var poolModule = require("generic-pool");
@@ -22,11 +23,55 @@ var steeplejack = require("steeplejack");
 
 var datatypes = steeplejack.Base.datatypes;
 
-var Db = mongodb.Db;
-var Server = mongodb.Server;
-
 
 /* Files */
+
+
+/**
+ * Parse Connection URL
+ *
+ * Converts the config object into a database
+ * string
+ *
+ * @param {object} config
+ * @returns {string}
+ */
+function parseConnectionUrl (config) {
+
+    var url = [
+        "mongodb://"
+    ];
+
+    var username = config.username;
+
+    if (username) {
+
+        url.push(username);
+        url.push(":");
+        url.push(config.password);
+        url.push("@");
+
+    }
+
+    if (config.host) {
+        url.push(config.host);
+    } else {
+        url.push("localhost");
+    }
+
+    if (config.port) {
+        url.push(":");
+        url.push(config.port);
+    }
+
+    if (config.db) {
+        url.push("/");
+        url.push(config.db);
+    }
+
+    return url.join("");
+
+}
 
 
 /**
@@ -54,45 +99,36 @@ function createConnection (config, StoreError) {
 
     return function (cb) {
 
-        var db = new Db(config.db, new Server(config.host, config.port), {
-            w: 1
+        var url = parseConnectionUrl(config);
+
+        var promise = mongodb.connect(url, {
+            promiseLibrary: bluebird
         });
 
-        /* Open the database */
-        db.open()
-            .then(function (db) {
+        var noPromise = _.isFunction(cb);
 
-                var username = config.username;
-                var password = config.password;
+        return promise.then(function (db) {
 
-                /* Do we want to authenticate */
-                if (username) {
-
-                    return db
-                        .authenticate(username, password)
-                        .then(function (result) {
-
-                            if (result !== true) {
-                                return bluebird.reject("Cannot authenticate the MongoDB");
-                            }
-
-                            return db;
-
-                        });
-
-                }
-
-                return db;
-
-            })
-            .then(function (db) {
-                /* Successfully connected - return the callback */
+            /* Successfully connected - return the callback */
+            if (noPromise) {
                 cb(null, db);
-            })
-            .catch(function (err) {
-                /* Wrap in a StoreError */
-                cb(new StoreError(err), null);
-            });
+            } else {
+                return db;
+            }
+
+        })
+        .catch(function (err) {
+
+            /* Wrap in a StoreError */
+            err = new StoreError(err);
+
+            if (noPromise) {
+                cb(err);
+            } else {
+                throw err;
+            }
+
+        });
 
     };
 
