@@ -1,6 +1,6 @@
 {
   "name": "steeplejack-mongodb",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "MongoDB implementation for steeplejack projects",
   "main": "./src/main",
   "dependencies": {
