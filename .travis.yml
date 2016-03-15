@@ -1,26 +1,18 @@
 language: node_js
 node_js:
-- '5.2'
-- '5.1'
-- '5.0'
-- '4.2'
-- '4.1'
-- '4.0'
+- node
+- '4.3'
+- iojs
 - '0.12'
-- '0.10'
-- 'iojs'
-- 'iojs-v2.5.0'
-- 'iojs-v1.8.4'
 matrix:
   fast_finish: true
-before_install:
-- npm install -g grunt-cli
+sudo: false
+before_script:
+- npm run typings
 script:
-- grunt ci
-- grunt coveralls:push
-env:
-  matrix:
-    secure: O30CH7mBjxTCb75lU3v6wOJTxxD63+oKKAI/SX/WPC7hy3AXEBDhJvUQ5v7yUMIUrhOKWbqdq68Y8n5/0NaSR0MheJkv321ThElCl+4NGJfCQh9FwVrWEKyvuWvV8eFxlrC3tuEWCHPaSyW2OJ4gHamy9IndeIpAAL32KRjlpG4hTi5h8V2XqGo7T/0XxYqLxvBfi24KW2Z75Pa2KtyCBE/QYJAeeFeVSr4iAWd6j1qgouxUycXWn8zFvaQHA0v58WPhciV0BF2lR6wwIUFbrsjlMhepsExbSAv34V9AjUrNH59zrWKhpRJenNfAsvP4jPTDPMdFJGW329FhKlR+T6Ywf+/yzbZssbj/ewizhT8CTuFqxbTgNRu0/2IQbYCrZ1X9LNCaC5Iw0+Ubt+NyC9NxwnpJnabVL3FF7yuv8SbsAoUAuGGl7g9u+7l5I8QOrnzP0mQw1H20HVv75hcNcXCPGgpuo16J5fhpY0bi5DoyLGBZ5alc9Ga2Qvu7WTxNe7D3uV1tXXme1x+JJBJOZVhuqGUjfiRO4yW8JGHvry/lERnniXyaxkIcja/5xQl3Z6azkyCziOtGK5Xn6E4amLG69Cjcf3nsvJ2cZL8IgoNTCdAtP8pFxZ/6oLlVgI8PLQJMzrjNRD1gKFaWYEj/X6CPFTbFdBKNVFffyMgysro=
+- npm run ci
+before_deploy:
+- npm run build
 deploy:
   provider: npm
   email: simon@simonemms.com

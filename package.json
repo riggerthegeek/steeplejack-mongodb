@@ -1,44 +1,21 @@
 {
   "name": "steeplejack-mongodb",
   "version": "1.0.0",
-  "description": "MongoDB implementation for steeplejack projects",
-  "main": "./src/main",
-  "dependencies": {
-    "bluebird": "^3.1.1",
-    "lodash": "^3.10.1"
-  },
-  "peerDependencies": {
-    "generic-pool": ">=2.0.0",
-    "mongodb": ">=2.0.0",
-    "steeplejack": "*"
-  },
-  "devDependencies": {
-    "chai": "^3.4.1",
-    "chai-as-promised": "^5.2.0",
-    "generic-pool": "^2.3.0",
-    "grunt": "^0.4.5",
-    "grunt-contrib-clean": "^0.7.0",
-    "grunt-contrib-jshint": "^0.11.3",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-coveralls": "^1.0.0",
-    "grunt-jscs": "^2.6.0",
-    "grunt-jsonlint": "^1.0.7",
-    "grunt-mocha-istanbul": "^3.0.1",
-    "grunt-mocha-test": "^0.12.7",
-    "grunt-prompt": "^1.3.3",
-    "grunt-shell": "^1.1.2",
-    "grunt-timer": "^0.6.0",
-    "istanbul": "^0.4.1",
-    "load-grunt-tasks": "^3.4.0",
-    "mocha": "^2.3.4",
-    "mongodb": "^2.1.3",
-    "proxyquire": "^1.7.3",
-    "semver": "^5.1.0",
-    "sinon": "^1.17.2",
-    "sinon-as-promised": "^4.0.0",
-    "sinon-chai": "^2.8.0",
-    "steeplejack": "*",
-    "steeplejack-errors": "^0.2.0"
+  "description": "MongoDB implementation for Steeplejack projects",
+  "main": "./index",
+  "scripts": {
+    "build": "npm run clean && tsc --declaration --sourceMap typings/main.d.ts index.ts interfaces/*.ts",
+    "buildAll": "npm run clean && tsc --outDir ./tmp --sourceMap index.ts interfaces/*.ts test/*.ts",
+    "ci": "npm test && npm run coverage",
+    "clean": "rm -Rf index.js interfaces/*.js index.js.map interfaces/*.js.map index.d.ts interfaces/*.d.ts tmp coverage",
+    "coverage": "npm run buildAll && rm -Rf ./coverage && istanbul cover _mocha ./tmp/test/ -- --recursive ./tmp/test && remap-istanbul -i ./coverage/coverage.json -o ./coverage/lcov-report -t html&& remap-istanbul -i ./coverage/coverage.json -o ./coverage/coverage.json  && istanbul check-coverage ./coverage/coverage.json --statements=100 --functions=100 --branches=100 --lines=100",
+    "lint": "tslint *.ts interfaces/*.ts",
+    "mocha": "npm run buildAll && mocha --recursive tmp/test",
+    "postversion": "git push && git push --tags",
+    "test": "npm run lint && npm run mocha",
+    "typings": "typings install",
+    "watch:coverage": "onchange 'src/**/*' 'test/**/*' -- npm run coverage",
+    "watch:test": "onchange 'src/**/*' 'test/**/*' -- npm test"
   },
   "author": "Simon Emms <simon@simonemms.com>",
   "contributors": [
@@ -49,13 +26,25 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/riggerthegeek/steeplejack-errors.git"
+    "url": "https://github.com/riggerthegeek/steeplejack-mongodb.git"
   },
   "bugs": {
-    "url": "https://github.com/riggerthegeek/steeplejack-errors/issues"
+    "url": "https://github.com/riggerthegeek/steeplejack-mongodb/issues"
   },
+  "keywords": [
+    "steeplejack",
+    "steeplejack-plugin",
+    "mongodb",
+    "db-resource"
+  ],
   "license": "MIT",
-  "scripts": {
-    "test": "grunt watchtest"
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "generic-pool": ">=2.0.0",
+    "mongodb": ">=2.0.0",
+    "steeplejack": "*"
+  },
+  "devDependencies": {
   }
 }

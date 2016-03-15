@@ -1,4 +1,14 @@
-Gruntfile.js
-coverage
-test
+/.tscache/
+/coverage/
+/node_modules/
+/test/
+/tmp/
+/typings/
+
+.baseDir.ts
+/Gruntfile.js
+/typings.json
+*.tmp.txt
 .*
+*.ts
+!*.d.ts
