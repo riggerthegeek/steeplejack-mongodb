@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "es6-promise": "github:typings/typed-es6-promise#94aac67ef7a14a8de8e9e1d3c1f9a26caa0d9fb1"
+    "es6-promise": "github:typings/typed-es6-promise#94aac67ef7a14a8de8e9e1d3c1f9a26caa0d9fb1",
+    "generic-pool": "registry:npm/generic-pool#2.4.0+20160131093110",
+    "mongodb": "registry:npm/mongodb#2.1.0+20160314195107"
   },
   "devDependencies": {
     "proxyquire": "github:typed-typings/npm-proxyquire#e94c99bbac8d350e28edd70471d9460a5534927b"
