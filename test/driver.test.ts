@@ -53,7 +53,7 @@ describe("MongoDB driver test", function () {
 
     });
 
-    describe.only("stubbed", function () {
+    describe("stubbed", function () {
 
         beforeEach(function () {
 
@@ -81,7 +81,7 @@ describe("MongoDB driver test", function () {
 
         });
 
-        it("should build with the default options", function (done: any) {
+        it("should build with the default options and connect", function (done: any) {
 
             let driver = this.driver();
 
@@ -128,6 +128,71 @@ describe("MongoDB driver test", function () {
 
                 expect(this.mongoConnect.connect).to.be.calledOnce
                     .calledWithExactly("mongodb://localhost", {});
+
+                done();
+
+            });
+
+            let client = {
+                close: sinon.stub().returns("destroyed")
+            };
+            expect(driver.data.destroy(client)).to.be.equal("destroyed");
+
+            expect(client.close).to.be.calledOnce
+                .calledWithExactly();
+
+        });
+
+        it("should build with the default options and fail to connect", function (done: any) {
+
+            let driver = this.driver();
+
+            expect(driver).to.be.instanceof(this.Pool);
+
+            expect(driver.data).to.have.keys([
+                "name",
+                "max",
+                "min",
+                "refreshIdle",
+                "idleTimeoutMillis",
+                "reapIntervalMillis",
+                "returnToHead",
+                "priorityRange",
+                "validate",
+                "validateAsync",
+                "log",
+                "create",
+                "destroy"
+            ]);
+
+            expect(driver.data.name).to.be.equal("mongodbResource");
+            expect(driver.data.max).to.be.undefined;
+            expect(driver.data.min).to.be.undefined;
+            expect(driver.data.refreshIdle).to.be.undefined;
+            expect(driver.data.idleTimeoutMillis).to.be.undefined;
+            expect(driver.data.reapIntervalMillis).to.be.undefined;
+            expect(driver.data.returnToHead).to.be.undefined;
+            expect(driver.data.priorityRange).to.be.undefined;
+            expect(driver.data.validate).to.be.undefined;
+            expect(driver.data.validateAsync).to.be.undefined;
+            expect(driver.data.log).to.be.undefined;
+
+            expect(driver.data.create).to.be.a("function");
+            expect(driver.data.destroy).to.be.a("function");
+
+            this.mongoConnect.connect.rejects("myerr");
+
+            driver.data.create((err: any, db: any) => {
+
+                expect(err).to.be.instanceof(this.StoreError);
+
+                expect(db).to.be.null;
+
+                expect(this.mongoConnect.connect).to.be.calledOnce
+                    .calledWithExactly("mongodb://localhost", {});
+
+                expect(this.StoreError).to.be.calledOnce
+                    .calledWithExactly(new Error("myerr"));
 
                 done();
 
