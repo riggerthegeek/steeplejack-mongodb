@@ -23,7 +23,7 @@ const name = "$mongodbResource";
 
 let factory = (StoreError: any) => {
 
-    return (config: IConfigInterface = { url: "mongodb://localhost" }) => {
+    return (config: IConfigInterface = { url: null }) => {
 
         /* Ensure we always receive an object for the options */
         let mongoOptions = Base.datatypes.setObject(config.mongoOptions, {});
@@ -43,7 +43,7 @@ let factory = (StoreError: any) => {
             log: poolOptions.log,
             create: (cb: (err: any, db: any) => any) => {
 
-                let promise = MongoClient.connect(config.url, mongoOptions);
+                let promise = MongoClient.connect(config.url || "mongodb://localhost", mongoOptions);
 
                 (<any> promise)
                     .then((result: any) => {
