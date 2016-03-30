@@ -29,7 +29,7 @@ describe("MongoDB driver test", function () {
                 "factory"
             ]);
 
-            expect(__factory.name).to.be.equal("$mongodbResource");
+            expect(__factory.name).to.be.equal("$mongodbDriver");
 
             expect(__factory.factory).to.be.an("array")
                 .have.length(2);

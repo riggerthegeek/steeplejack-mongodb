@@ -18,9 +18,11 @@ import {MongoClient} from "mongodb";
 import {IConfigInterface} from "./configInterface";
 
 
-const name = "$mongodbResource";
+/* Name with which to export this module to Steeplejack */
+const name = "$mongodbDriver";
 
 
+/* Configure the module */
 let factory = (StoreError: any) => {
 
     return (config: IConfigInterface = { url: null }) => {
