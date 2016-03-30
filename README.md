@@ -8,11 +8,40 @@
 
 MongoDB implementation for steeplejack projects
 
+## Usage
 
+This is a very thin wrapper for the MongoDB
+[MongoClient.connect](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html#.connect). It configures an
+instance of the MongoDB driver wrapped in [generic-pool](https://github.com/coopernurse/node-pool) class for easy
+connection pooling.
 
+This configures a Steeplejack injectable module called `$mongodbDriver`.
 
+```javascript
+// Configure a factory dependency
+export let __factory = {
+    name: "$mongodbResource",
+    factory: ($mongodbDriver) => {
 
+        let poolOptions = {};
+        let mongoOptions = {};
+        let mongoUrl = "mongodb://localhost/db";
 
+        return $mongodbDriver({
+            url: mongoUrl,
+            poolOptions,
+            mongoOptions
+        });
+
+    }
+};
+```
+
+The `poolOptions` accepts anything that the [generic-pool](https://github.com/coopernurse/node-pool#documentation)
+takes.
+
+The `mongoOptions` accepts anything that the
+[MongoClient.connect options](http://mongodb.github.io/node-mongodb-native/2.1/api/MongoClient.html#.connect) take.
 
 
 [node-version-image]: https://img.shields.io/badge/node.js-%3E%3D_0.10-brightgreen.svg?style=flat
