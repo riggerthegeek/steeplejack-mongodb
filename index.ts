@@ -16,9 +16,7 @@ import {Plugin} from "steeplejack/lib/plugin";
 
 
 /* Files */
-import * as driver from "./src/driver";
-
-console.log(driver);
+import * as driver from "./lib/driver";
 
 
 /* Add the modules to the plugin */
