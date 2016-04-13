@@ -77,31 +77,11 @@ describe("MongoDB driver test", function () {
 
             expect(driver.data).to.have.keys([
                 "name",
-                "max",
-                "min",
-                "refreshIdle",
-                "idleTimeoutMillis",
-                "reapIntervalMillis",
-                "returnToHead",
-                "priorityRange",
-                "validate",
-                "validateAsync",
-                "log",
                 "create",
                 "destroy"
             ]);
 
             expect(driver.data.name).to.be.equal("mongodbResource");
-            expect(driver.data.max).to.be.undefined;
-            expect(driver.data.min).to.be.undefined;
-            expect(driver.data.refreshIdle).to.be.undefined;
-            expect(driver.data.idleTimeoutMillis).to.be.undefined;
-            expect(driver.data.reapIntervalMillis).to.be.undefined;
-            expect(driver.data.returnToHead).to.be.undefined;
-            expect(driver.data.priorityRange).to.be.undefined;
-            expect(driver.data.validate).to.be.undefined;
-            expect(driver.data.validateAsync).to.be.undefined;
-            expect(driver.data.log).to.be.undefined;
 
             expect(driver.data.create).to.be.a("function");
             expect(driver.data.destroy).to.be.a("function");
@@ -143,31 +123,11 @@ describe("MongoDB driver test", function () {
 
             expect(driver.data).to.have.keys([
                 "name",
-                "max",
-                "min",
-                "refreshIdle",
-                "idleTimeoutMillis",
-                "reapIntervalMillis",
-                "returnToHead",
-                "priorityRange",
-                "validate",
-                "validateAsync",
-                "log",
                 "create",
                 "destroy"
             ]);
 
             expect(driver.data.name).to.be.equal("mongodbResource");
-            expect(driver.data.max).to.be.undefined;
-            expect(driver.data.min).to.be.undefined;
-            expect(driver.data.refreshIdle).to.be.undefined;
-            expect(driver.data.idleTimeoutMillis).to.be.undefined;
-            expect(driver.data.reapIntervalMillis).to.be.undefined;
-            expect(driver.data.returnToHead).to.be.undefined;
-            expect(driver.data.priorityRange).to.be.undefined;
-            expect(driver.data.validate).to.be.undefined;
-            expect(driver.data.validateAsync).to.be.undefined;
-            expect(driver.data.log).to.be.undefined;
 
             expect(driver.data.create).to.be.a("function");
             expect(driver.data.destroy).to.be.a("function");
@@ -212,31 +172,11 @@ describe("MongoDB driver test", function () {
 
             expect(driver.data).to.have.keys([
                 "name",
-                "max",
-                "min",
-                "refreshIdle",
-                "idleTimeoutMillis",
-                "reapIntervalMillis",
-                "returnToHead",
-                "priorityRange",
-                "validate",
-                "validateAsync",
-                "log",
                 "create",
                 "destroy"
             ]);
 
             expect(driver.data.name).to.be.equal("mongodbResource");
-            expect(driver.data.max).to.be.undefined;
-            expect(driver.data.min).to.be.undefined;
-            expect(driver.data.refreshIdle).to.be.undefined;
-            expect(driver.data.idleTimeoutMillis).to.be.undefined;
-            expect(driver.data.reapIntervalMillis).to.be.undefined;
-            expect(driver.data.returnToHead).to.be.undefined;
-            expect(driver.data.priorityRange).to.be.undefined;
-            expect(driver.data.validate).to.be.undefined;
-            expect(driver.data.validateAsync).to.be.undefined;
-            expect(driver.data.log).to.be.undefined;
 
             expect(driver.data.create).to.be.a("function");
             expect(driver.data.destroy).to.be.a("function");

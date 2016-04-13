@@ -31,37 +31,35 @@ let factory = (StoreError: any) => {
         let mongoOptions = Base.datatypes.setObject(config.mongoOptions, {});
         let poolOptions = Base.datatypes.setObject(config.poolOptions, {});
 
-        return new Pool({
-            name: poolOptions.name || "mongodbResource",
-            max: poolOptions.max,
-            min: poolOptions.min,
-            refreshIdle: poolOptions.refreshIdle,
-            idleTimeoutMillis: poolOptions.idleTimeoutMillis,
-            reapIntervalMillis: poolOptions.reapIntervalMillis,
-            returnToHead: poolOptions.returnToHead,
-            priorityRange: poolOptions.priorityRange,
-            validate: poolOptions.validate,
-            validateAsync: poolOptions.validateAsync,
-            log: poolOptions.log,
-            create: (cb: (err: any, db: any) => any) => {
+        /* Set a default name */
+        if (!poolOptions.name) {
+            poolOptions.name = "mongodbResource";
+        }
 
-                let promise = MongoClient.connect(config.url || "mongodb://localhost", mongoOptions);
+        /* Set the constructor */
+        poolOptions.create = (cb: (err: any, db: any) => any) => {
 
-                (<any> promise)
-                    .then((result: any) => {
-                        /* Return the database */
-                        cb(null, result);
-                    })
-                    .catch((err: any) => {
-                        /* Wrap the error in the StoreError class */
-                        cb(new StoreError(err), null);
-                    });
+            let promise = MongoClient.connect(config.url || "mongodb://localhost", mongoOptions);
 
-            },
-            destroy: db => {
-                return db.close();
-            }
-        });
+            (<any> promise)
+                .then((result: any) => {
+                    /* Return the database */
+                    cb(null, result);
+                })
+                .catch((err: any) => {
+                    /* Wrap the error in the StoreError class */
+                    cb(new StoreError(err), null);
+                });
+
+        };
+
+        /* Set the destructor */
+        poolOptions.destroy = db => {
+            return db.close();
+        };
+
+
+        return new Pool(poolOptions);
 
     };
 
