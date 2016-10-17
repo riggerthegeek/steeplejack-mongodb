@@ -10,7 +10,7 @@
 
 /* Third-party modules */
 import {Base} from "steeplejack/lib/base";
-import {Pool} from "generic-pool";
+const Pool = require("generic-pool").Pool;
 import {MongoClient} from "mongodb";
 
 
